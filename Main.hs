@@ -1,25 +1,8 @@
-import Debug.Trace
 import Graphics.Gloss
-import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Interface.Pure.Game
 
-data World = World {
-      balls :: [Ball]
-    , walls :: [Wall]
-    , drawing :: DrawState
-    } deriving (Show)
-
-data Ball = Ball {
-      pos :: (Float, Float)
-    , vel :: (Float, Float)
-    , radius :: Float
-    } deriving (Show)
-
-data Wall = Wall (Float, Float) (Float, Float)
-            deriving (Show)
-
-data DrawState = Drawing Wall | NotDrawing
-                 deriving (Show)
+import World
+import Collisions
 
 initialWorld :: World
 initialWorld = World { balls = [Ball { pos = (0, 240), vel = (0, 0), radius = 20 }]
@@ -51,8 +34,12 @@ handleEvent event world@(World { drawing = dwg, walls = ws }) =
       EventKey (MouseButton LeftButton) Up _ _ ->
           case dwg of
             NotDrawing -> world
-            Drawing w -> world { walls = w:ws
-                               , drawing = NotDrawing }
+            Drawing w@(Wall start end) ->
+                world {
+                     walls = if (end - start) /= 0
+                             then w:ws
+                             else ws
+                   , drawing = NotDrawing }
       EventMotion mPos ->
           case dwg of
             NotDrawing -> world
@@ -61,7 +48,7 @@ handleEvent event world@(World { drawing = dwg, walls = ws }) =
 
 step :: Float -> World -> World
 step dt world@(World { balls = bs, walls = ws }) =
-    world { balls = map (\b -> stepBall dt $ foldr collide b ws) bs }
+    world { balls = map (\b -> foldr collideWB (stepBall dt b) ws) bs }
 
 gravity :: Float
 gravity = 0.03
