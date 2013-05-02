@@ -7,6 +7,8 @@ module World
 , Wall (Wall)
 , pos
 , vel
+, theta
+, omega
 , radius
 , DrawState (Drawing, NotDrawing) ) where
 
@@ -19,6 +21,8 @@ data World = World {
 data Ball = Ball {
       pos :: (Float, Float)
     , vel :: (Float, Float)
+    , theta :: Float
+    , omega :: Float
     , radius :: Float
     } deriving (Show)
 
