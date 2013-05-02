@@ -4,6 +4,7 @@ module World
 , balls
 , walls
 , drawing
+, future
 , Wall (Wall)
 , pos
 , vel
@@ -16,6 +17,7 @@ data World = World {
       balls :: [Ball]
     , walls :: [Wall]
     , drawing :: DrawState
+    , future :: Bool
     } deriving (Show)
 
 data Ball = Ball {
