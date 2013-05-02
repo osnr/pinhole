@@ -25,11 +25,6 @@ offsetSegCircle sa sb c r
           where pt = closestPointOnSeg sa sb c
                 dist_v = c `subV` pt
 
-projV :: Vector -> Vector -> Vector
-projV a b = let bu = normaliseV b
-                proj = a `dotV` bu in
-            proj `mulSV` bu
-
 addV :: Vector -> Vector -> Vector
 addV (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
 
@@ -48,12 +43,13 @@ reflectWB (Wall start end) b@(Ball { vel = v, theta = t, radius = r }) =
       , theta = t - l_sig / r }
 
 collideWB :: Wall -> Ball -> Ball
-collideWB w@(Wall start end) b@(Ball { pos = c, radius = r }) =
-    let o = offsetSegCircle start end c r in
-    if o /= (0, 0)
-    then let b' = b { pos = c `addV` o } in
-         reflectWB w b'
-    else b
+collideWB w@(Wall start end) b@(Ball { pos = c, radius = r })
+    | (end `subV` start) == (0, 0) = b
+    | otherwise = let o = offsetSegCircle start end c r in
+                  if o /= (0, 0)
+                  then let b' = b { pos = c `addV` o } in
+                       reflectWB w b'
+                  else b
 
 {-collideWB (Wall (sx, sy) (ex, ey))
           ball@(Ball { pos = (bx, by), vel = v, radius = br }) =

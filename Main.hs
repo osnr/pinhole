@@ -6,6 +6,8 @@ import Graphics.Gloss.Interface.Pure.Game
 import World
 import Collisions
 
+import Debug.Trace
+
 initialWorld :: World
 initialWorld = World { balls = [Ball { pos = (0, 240)
                                      , vel = (0, 0)
@@ -16,21 +18,37 @@ initialWorld = World { balls = [Ball { pos = (0, 240)
                      , drawing = NotDrawing }
 
 draw :: World -> Picture
-draw World { balls = bs
-           , walls = ws
-           , drawing = dwg } = pictures [ pictures $ map drawBall bs
-                                        , pictures $ map drawWall $ case dwg of
-                                            Drawing dw -> dw:ws
-                                            NotDrawing -> ws ]
+draw world = pictures [ drawFutures world, drawWorld world ]
 
-drawBall :: Ball -> Picture
-drawBall Ball { pos = (x, y), vel = (vx, vy), theta = t, radius = r } =
+drawWorld :: World -> Picture
+drawWorld World { balls = bs, walls = ws, drawing = dwg } =
+    pictures [ pictures $ map (drawBall white 2) bs
+             , pictures $ map drawWall $ case dwg of
+                                           Drawing dw -> dw:ws
+                                           NotDrawing -> ws
+             ]
+
+everyNth :: Int -> [a] -> [a]
+everyNth n xs = y:everyNth n ys where y:ys = drop (n-1) xs 
+
+drawFutureBalls :: Float -> (Int, World) -> Picture
+drawFutureBalls maxN (n, World { balls = bs }) = 
+    let com = 1 - fromIntegral n / maxN
+        clr = makeColor com com com com in
+    pictures $ map (drawBall clr com) bs
+
+drawFutures :: World -> Picture
+drawFutures = pictures . take 10 . map (drawFutureBalls 180) .
+              filter ((== 0) . (`mod` 15) . fst) . zip [1..] . iterate (step 0)
+
+drawBall :: Color -> Float -> Ball -> Picture
+drawBall clr th Ball { pos = (x, y), vel = (vx, vy), theta = t, radius = r } =
     let (d1x, d1y) = rotateV t (2*r, 0)
         (d2x, d2y) = rotateV t (0, 2*r) in
-    pictures [ Color white $ Pictures [ Translate x y $ Circle r
-                                      , Line [(x - d1x/2, y - d1y/2), (x + d1x/2, y + d1y/2)]
-                                      , Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ]
-             , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
+    pictures [ Color clr $ Pictures [ Translate x y $ ThickCircle r th
+                                    , Line [(x - d1x/2, y - d1y/2), (x + d1x/2, y + d1y/2)]
+                                    , Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ] ]
+             -- , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
 
 drawWall :: Wall -> Picture
 drawWall (Wall start end) = Color white $ Line [start, end]
@@ -58,8 +76,11 @@ handleEvent event world@(World { drawing = dwg, walls = ws }) =
       _ -> world
 
 step :: Float -> World -> World
-step dt world@(World { balls = bs, walls = ws }) =
-    world { balls = map (\b -> foldr collideWB (stepBall dt b) ws) bs }
+step dt world@(World { balls = bs, walls = ws, drawing = dwg }) =
+    world { balls = let ws' = case dwg of
+                                Drawing dw -> dw:ws
+                                NotDrawing -> ws in
+                    map (\b -> foldr collideWB (stepBall dt b) ws') bs }
 
 gravity :: Float
 gravity = 0.03
