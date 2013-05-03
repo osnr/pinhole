@@ -22,10 +22,14 @@ initialWorld = World { balls = [Ball { pos = (0, 240)
                                      , theta = 0 -- radians
                                      , omega = 0
                                      , radius = 20 }]
-                     , walls = [ Wall (-screenWidth/2, -screenHeight/2 + 1) (-screenWidth/3, -screenHeight/2 + 1) -- bottom-left
-                               , Wall (-screenWidth/4, -screenHeight/2 + 1) (screenWidth/2, -screenHeight/2 + 1) -- bottom-right
-                               , Wall (-screenWidth/2 + 1, -screenHeight/2) (-screenWidth/2 + 1, screenHeight/2) -- left
-                               , Wall (screenWidth/2 - 1, -screenHeight/2) (screenWidth/2 - 1, screenHeight/2) -- right
+                     , walls = [ Wall (-screenWidth/2, -screenHeight/2 + 1)
+                                          (-screenWidth/3, -screenHeight/2 + 1) -- bottom-left
+                               , Wall (-screenWidth/4, -screenHeight/2 + 1)
+                                          (screenWidth/2, -screenHeight/2 + 1) -- bottom-right
+                               , Wall (-screenWidth/2 + 1, -screenHeight/2)
+                                          (-screenWidth/2 + 1, screenHeight/2) -- left
+                               , Wall (screenWidth/2 - 1, -screenHeight/2)
+                                          (screenWidth/2 - 1, screenHeight/2) -- right
                                ]
                      , drawing = NotDrawing
                      , future = False }
@@ -49,17 +53,17 @@ drawFutureBalls maxN (n, World { balls = bs }) =
     pictures $ map (drawBall clr com) bs
 
 drawFutures :: World -> Picture
-drawFutures = pictures . take 20 . map (drawFutureBalls 50000) .
+drawFutures = pictures . take 40 . map (drawFutureBalls 50000) .
               filter ((== 0) . (`mod` 15) . fst) . zip [1..] . iterate (stepPlay 0)
 
 drawBall :: Color -> Float -> Ball -> Picture
-drawBall clr th Ball { pos = (x, y), theta = t, radius = r } =
+drawBall clr th Ball { pos = (x, y), theta = t, radius = r, vel = (vx, vy) } =
     let (d1x, d1y) = rotateV t (2*r, 0)
         (d2x, d2y) = rotateV t (0, 2*r) in
     pictures [ Color clr $ Pictures [ Translate x y $ ThickCircle r th
-                                    ]] --, Line [(x - d1x/2, y - d1y/2), (x + d1x/2, y + d1y/2)]
-                                    --, Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ] ]
-             -- , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
+                                    , Line [(x - d1x/2, y - d1y/2), (x + d1x/2, y + d1y/2)]
+                                    , Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ]
+             , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
 
 drawWall :: Wall -> Picture
 drawWall (Wall start end) = Color white $ Line [start, end]
@@ -86,6 +90,8 @@ handlePlayEvent event world@(World { drawing = dwg, walls = ws, future = ft }) =
             Drawing (Wall start _) -> world { drawing = Drawing $ Wall start mPos }
       EventKey (Char 'f') Up _ _ ->
           world { future = not ft }
+      EventKey (Char 'r') Up _ _ ->
+          initialWorld
       _ -> world
 
 stepPlay :: Float -> World -> World
