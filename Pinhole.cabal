@@ -1,0 +1,14 @@
+Name:           Pinhole
+Version:        0.0
+Description:    A 2D physics puzzle game. Draw lines to roll a ball into a hole!
+License:        GPL
+License-file:   LICENSE
+Author:         Omar Rizwan
+Maintainer:     omar.rizwan@gmail.com
+Build-Type:     Simple
+Cabal-Version:  >=1.2
+Executable Pinhole
+           Main-is:             Main.hs
+           hs-source-dirs:      Pinhole
+           Build-Depends:       base >= 3 && < 5,
+                                gloss == 1.7.*
