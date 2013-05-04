@@ -1,10 +1,11 @@
-module Collisions ( collideWB ) where
+module Play.Collisions ( collideWB ) where
+
 import Debug.Trace
 import Graphics.Gloss.Data.Point
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Line
 
-import World
+import Play.World
 
 closestPointOnSeg :: Point -> Point -> Point -> Point
 closestPointOnSeg sa sb c
@@ -50,25 +51,3 @@ collideWB w@(Wall start end) b@(Ball { pos = c, radius = r })
                   then let b' = b { pos = c `addV` o } in
                        reflectWB w pt b'
                   else b
-
-{-collideWB (Wall (sx, sy) (ex, ey))
-          ball@(Ball { pos = (bx, by), vel = v, radius = br }) =
-    let x1 = sx - bx
-        y1 = sy - by
-
-        x2 = ex - bx
-        y2 = ey - by
-
-        dx = x2 - x1
-        dy = y2 - y1
-        dr = sqrt $ dx**2 + dy**2
-        d = x1*y2 - x2*y1
-
-        delta = (br * 0.9)**2 * dr**2 - d**2 in
-    if delta >= 0
-    then trace "hi"
-         ball { vel = let ballAngle = argV v
-                          wallAngle = argV (ex - sx, ey - sy)
-                          ballAngle' = 2 * (wallAngle - ballAngle) + 180 in
-                      magV v `mulSV` unitVectorAtAngle ballAngle' }
-    else ball-}

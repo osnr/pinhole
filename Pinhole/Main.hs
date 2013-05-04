@@ -3,8 +3,9 @@ import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Angle
 import Graphics.Gloss.Interface.Pure.Game
 
-import World
-import Collisions
+import Play.Draw
+import Play.Step
+import Play.World
 
 import Debug.Trace
 
@@ -34,40 +35,6 @@ initialWorld = World { balls = [Ball { pos = (0, 240)
                      , drawing = NotDrawing
                      , future = False }
 
-drawPlay :: World -> Picture
-drawPlay world | future world = pictures [ drawFutures world, drawWorld world ]
-               | otherwise = drawWorld world
-
-drawWorld :: World -> Picture
-drawWorld World { balls = bs, walls = ws, drawing = dwg } =
-    pictures [ pictures $ map (drawBall white 2) bs
-             , pictures $ map drawWall $ case dwg of
-                                           Drawing dw -> dw:ws
-                                           NotDrawing -> ws
-             ]
-
-drawFutureBalls :: Float -> (Int, World) -> Picture
-drawFutureBalls maxN (n, World { balls = bs }) = 
-    let com = 1 - logBase maxN (fromIntegral n)
-        clr = makeColor com com com com in
-    pictures $ map (drawBall clr com) bs
-
-drawFutures :: World -> Picture
-drawFutures = pictures . take 40 . map (drawFutureBalls 50000) .
-              filter ((== 0) . (`mod` 15) . fst) . zip [1..] . iterate (stepPlay 0)
-
-drawBall :: Color -> Float -> Ball -> Picture
-drawBall clr th Ball { pos = (x, y), theta = t, radius = r, vel = (vx, vy) } =
-    let (d1x, d1y) = rotateV t (2*r, 0)
-        (d2x, d2y) = rotateV t (0, 2*r) in
-    pictures [ Color clr $ Pictures [ Translate x y $ ThickCircle r th
-                                    , Line [(x - d1x/2, y - d1y/2), (x + d1x/2, y + d1y/2)]
-                                    , Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ]
-             , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
-
-drawWall :: Wall -> Picture
-drawWall (Wall start end) = Color white $ Line [start, end]
-
 handlePlayEvent :: Event -> World -> World
 handlePlayEvent event world@(World { drawing = dwg, walls = ws, future = ft }) =
     case event of
@@ -93,22 +60,6 @@ handlePlayEvent event world@(World { drawing = dwg, walls = ws, future = ft }) =
       EventKey (Char 'r') Up _ _ ->
           initialWorld
       _ -> world
-
-stepPlay :: Float -> World -> World
-stepPlay dt world@(World { balls = bs, walls = ws, drawing = dwg }) =
-    world { balls = let ws' = case dwg of
-                                Drawing dw -> dw:ws
-                                NotDrawing -> ws in
-                    map (\b -> foldr collideWB (stepBall dt b) ws') bs }
-
-gravity :: Float
-gravity = 0.03
-
-stepBall :: Float -> Ball -> Ball
-stepBall _ ball@(Ball { pos = (x, y), vel = (vx, vy), theta = t, omega = w }) =
-    ball { pos = (x + vx, y + vy)
-         , vel = (vx, vy - gravity)
-         , theta = t + w }
 
 draw :: GameState -> Picture
 draw (Intro _) = Translate (-160) 0 . Color white . Scale 0.5 0.5 $ Text "Pinhole"

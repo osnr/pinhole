@@ -1,4 +1,4 @@
-module World
+module Play.World
 ( World (World)
 , Ball (Ball)
 , balls

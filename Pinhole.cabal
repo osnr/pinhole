@@ -1,6 +1,6 @@
 Name:           Pinhole
 Version:        0.0
-Description:    A 2D physics puzzle game. Draw lines to roll a ball into a hole!
+Description:    A 2D physics puzzle game. Draw walls to direct the ball into a hole!
 License:        GPL
 License-file:   LICENSE
 Author:         Omar Rizwan
