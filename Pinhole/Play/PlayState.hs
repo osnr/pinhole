@@ -1,35 +1,41 @@
-module Play.World
-( World (World)
-, Ball (Ball)
+module Play.PlayState
+( PlayState (PlayState)
+, level
 , balls
-, walls
+, drawnWalls
 , drawing
 , future
-, Wall (Wall)
+
+, Ball (Ball)
 , pos
 , vel
 , theta
 , omega
 , radius
+
 , DrawState (Drawing, NotDrawing) ) where
 
-data World = World {
-      balls :: [Ball]
-    , walls :: [Wall]
+import Graphics.Gloss.Data.Vector
+
+import Level.Level
+
+data PlayState = PlayState {
+      level :: Level
+
+    , balls :: [Ball]
+    , drawnWalls :: [Wall]
+
     , drawing :: DrawState
     , future :: Bool
     } deriving (Show)
 
 data Ball = Ball {
-      pos :: (Float, Float)
-    , vel :: (Float, Float)
+      pos :: Vector
+    , vel :: Vector
     , theta :: Float
     , omega :: Float
     , radius :: Float
     } deriving (Show)
-
-data Wall = Wall (Float, Float) (Float, Float)
-            deriving (Show)
 
 data DrawState = Drawing Wall | NotDrawing
                  deriving (Show)

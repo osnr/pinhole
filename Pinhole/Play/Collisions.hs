@@ -1,11 +1,10 @@
 module Play.Collisions ( collideWB ) where
 
-import Debug.Trace
 import Graphics.Gloss.Data.Point
 import Graphics.Gloss.Data.Vector
-import Graphics.Gloss.Geometry.Line
 
-import Play.World
+import Level.Level
+import Play.PlayState
 
 closestPointOnSeg :: Point -> Point -> Point -> Point
 closestPointOnSeg sa sb c
@@ -35,7 +34,7 @@ normal :: Float
 normal = 1.10
 
 reflectWB :: Wall -> Point -> Ball -> Ball
-reflectWB (Wall start end) pt b@(Ball { pos = c, vel = v, theta = t, radius = r }) =
+reflectWB _ pt b@(Ball { pos = c, vel = v, theta = t, radius = r }) =
     let n = mulSV normal . normaliseV $ c `subV` pt
         v' = v `subV` ((v `dotV` n) `mulSV` n)
         l_sig = v `detV` n in

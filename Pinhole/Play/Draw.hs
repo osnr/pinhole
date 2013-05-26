@@ -1,36 +1,47 @@
 module Play.Draw
 ( drawPlay
-, drawWorld
-, drawFutureBalls
-, drawFutures
+, drawPlayState
 , drawBall
 , drawWall ) where
 
 import Graphics.Gloss
 import Graphics.Gloss.Data.Vector
+import Graphics.Gloss.Data.Color
 
-import Play.World
+import Level.Level
+
+import Play.PlayState
 import Play.Step
 
-drawPlay :: World -> Picture
-drawPlay world | future world = Pictures [ drawFutures world, drawWorld world ]
-               | otherwise = drawWorld world
+import Debug.Trace
 
-drawWorld :: World -> Picture
-drawWorld World { balls = bs, walls = ws, drawing = dwg } =
+drawPlay :: PlayState -> Picture
+drawPlay pl | future pl = Pictures [ drawFutures pl, drawPlayState pl ]
+            | otherwise = drawPlayState pl
+
+drawPlayState :: PlayState -> Picture
+drawPlayState PlayState { level = l, balls = bs, drawnWalls = ws, drawing = dwg } =
     Pictures [ Pictures $ map (drawBall white 2) bs
-             , Pictures $ map drawWall $ case dwg of
-                                           Drawing dw -> dw:ws
-                                           NotDrawing -> ws
-             ]
+             , Pictures $ map (drawWall white) $ case dwg of
+                                                   Drawing dw -> dw:ws
+                                                   NotDrawing -> ws
+             , drawLevel l ]
 
-drawFutureBalls :: Float -> (Int, World) -> Picture
-drawFutureBalls maxN (n, World { balls = bs }) = 
+drawLevel :: Level -> Picture
+drawLevel Level { walls = ws, goal = g } =
+    Pictures $ map (drawWall (greyN 0.5)) ws -- drawGoal g :
+
+drawGoal :: Goal -> Picture
+drawGoal (p1@(p1x, p1y), p2@(p2x, p2y)) = Color blue
+                                          $ Polygon [p1, (p1x, p2y), p2, (p2x, p1y)]
+
+drawFutureBalls :: Float -> (Int, PlayState) -> Picture
+drawFutureBalls maxN (n, PlayState { balls = bs }) = 
     let com = 1 - logBase maxN (fromIntegral n)
         clr = makeColor com com com com in
     pictures $ map (drawBall clr com) bs
 
-drawFutures :: World -> Picture
+drawFutures :: PlayState -> Picture
 drawFutures = Pictures . take 40 . map (drawFutureBalls 50000) .
               filter ((== 0) . (`mod` 15) . fst) . zip [1..] . iterate (stepPlay 0)
 
@@ -43,5 +54,5 @@ drawBall clr th Ball { pos = (x, y), theta = t, radius = r, vel = (vx, vy) } =
                                     , Line [(x - d2x/2, y - d2y/2), (x + d2x/2, y + d2y/2)] ]
              , Color green $ Line [(x, y), (x + vx*5, y + vy*5)] ]
 
-drawWall :: Wall -> Picture
-drawWall (Wall start end) = Color white $ Line [start, end]
+drawWall :: Color -> Wall -> Picture
+drawWall color (Wall start end) = Color color $ Line [start, end]
