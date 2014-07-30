@@ -11,4 +11,4 @@ Executable Pinhole
            Main-is:             Main.hs
            hs-source-dirs:      Pinhole
            Build-Depends:       base >= 3 && < 5,
-                                gloss == 1.7.*
+                                gloss == 1.8.*
