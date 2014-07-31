@@ -8,7 +8,11 @@ Maintainer:     omar.rizwan@gmail.com
 Build-Type:     Simple
 Cabal-Version:  >=1.2
 Executable Pinhole
-           Main-is:             Main.hs
-           hs-source-dirs:      Pinhole
-           Build-Depends:       base >= 3 && < 5,
-                                gloss == 1.8.*
+  Main-is:             Main.hs
+  hs-source-dirs:      Pinhole
+  Build-Depends:       base >= 3 && < 5,
+                       gloss == 1.8.*
+  if os(windows)
+    ghc-options:       -threaded -O2 -optl-mwindows
+  else
+    ghc-options:       -threaded -O2
