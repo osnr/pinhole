@@ -15,6 +15,6 @@ Executable Pinhole
                        gloss == 1.8.*,
                        cabal-macosx
   if os(windows)
-    ghc-options:       -threaded -O2 -optl-mwindows
+    ghc-options:       -Wall -threaded -O2 -optl-mwindows
   else
-    ghc-options:       -threaded -O2
+    ghc-options:       -Wall -threaded -O2

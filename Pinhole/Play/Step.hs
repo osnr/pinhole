@@ -6,9 +6,17 @@ import Play.PlayState
 import Play.Collisions
 
 step :: Float -> PlayState -> PlayState
-step dt pl = if paused pl
-             then pl
-             else stepPlay dt pl
+step dt pl =
+    let pl' = case docState pl of
+                DocShownFor t ->
+                    pl { docState = let t' = t + dt
+                                    in if t' > 10
+                                       then DocDone
+                                       else DocShownFor t' }
+                DocDone -> pl
+    in if paused pl'
+       then pl'
+       else stepPlay dt pl'
 
 stepPlay :: Float -> PlayState -> PlayState
 stepPlay dt pl@(PlayState { level = l, balls = bs, drawnWalls = ws, drawing = dwg }) =

@@ -1,17 +1,32 @@
 module Play.Draw
-( drawPlay
+( draw
+, drawPlay
 , drawPlayState
 , drawBall
 , drawWall ) where
 
 import Graphics.Gloss
 import Graphics.Gloss.Data.Vector
-import Graphics.Gloss.Data.Color
 
 import Level.Level
 
 import Play.PlayState
 import Play.Step
+
+doc :: Picture
+doc = color white $ pictures [ text "draw walls by dragging"
+                             , translate 0 (-160) $ text "press F to see the future"
+                             , translate 408 (-160 * 2) $ text "P to pause"
+                             , translate 408 (-160 * 3) $ text "R to restart" ]
+
+draw :: PlayState -> Picture
+draw pl = case docState pl of
+            DocShownFor _ -> withDoc
+            DocDone       -> if paused pl
+                             then withDoc
+                             else drawPlay pl
+    where withDoc = pictures [ translate 100 (-150) $ scale 0.1 0.1 $ doc
+                             , drawPlay pl ]
 
 drawPlay :: PlayState -> Picture
 drawPlay pl | future pl = pictures [ drawFutures pl, drawPlayState pl ]
@@ -26,12 +41,8 @@ drawPlayState PlayState { level = l, balls = bs, drawnWalls = ws, drawing = dwg 
              , drawLevel l ]
 
 drawLevel :: Level -> Picture
-drawLevel Level { walls = ws, goal = g } =
+drawLevel Level { walls = ws } =
     pictures $ map (drawWall (greyN 0.5)) ws -- drawGoal g :
-
-drawGoal :: Goal -> Picture
-drawGoal (p1@(p1x, p1y), p2@(p2x, p2y)) = color blue
-                                          $ polygon [p1, (p1x, p2y), p2, (p2x, p1y)]
 
 drawFutureBalls :: Float -> (Int, PlayState) -> Picture
 drawFutureBalls maxN (n, PlayState { balls = bs }) = 

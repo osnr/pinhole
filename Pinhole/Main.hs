@@ -19,6 +19,6 @@ main =
          black
          60
          (playLevel initialLevel)
-         drawPlay
+         draw
          handlePlayEvent
          step

@@ -3,6 +3,10 @@ module Play.PlayState
 , level
 , balls
 , drawnWalls
+
+, DocState (DocShownFor, DocDone)
+, docState
+
 , drawing
 , future
 , paused
@@ -29,6 +33,8 @@ data PlayState = PlayState {
     , balls :: [Ball]
     , drawnWalls :: [Wall]
 
+    , docState :: DocState
+
     , drawing :: DrawState
     , future :: Bool
     , paused :: Bool
@@ -42,6 +48,9 @@ data Ball = Ball {
     , radius :: Float
     } deriving (Show)
 
+data DocState = DocShownFor Float | DocDone
+                deriving (Show)
+
 data DrawState = Drawing Wall | NotDrawing
                  deriving (Show)
 
@@ -51,6 +60,9 @@ playLevel l = PlayState {
 
               , balls = [initBall l]
               , drawnWalls = []
+
+              , docState = DocShownFor 0
+
               , drawing = NotDrawing
               , future = False
               , paused = False }
