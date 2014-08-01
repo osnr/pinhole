@@ -2,7 +2,7 @@ import Distribution.Simple
 import Distribution.MacOSX
 
 main :: IO ()
-main = defaultMainWithHooks macHooks $ simpleUserHooks {
+main = defaultMainWithHooks $ simpleUserHooks {
          postBuild = appBundleBuildHook guiApps
        }
 
