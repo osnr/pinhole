@@ -1,8 +1,11 @@
 import Graphics.Gloss.Interface.Pure.Game
 
-import GameState
-
 import Level.Level
+
+import Play.PlayState
+import Play.Events
+import Play.Step
+import Play.Draw
 
 screenWidth :: Num a => a
 screenWidth = 640
@@ -16,6 +19,6 @@ main =
          black
          60
          (playLevel initialLevel)
-         draw
-         handleEvent
+         drawPlay
+         handlePlayEvent
          step

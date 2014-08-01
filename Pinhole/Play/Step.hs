@@ -1,9 +1,14 @@
-module Play.Step ( stepPlay, stepBall ) where
+module Play.Step ( step, stepPlay, stepBall ) where
 
 import Level.Level
 import Play.PlayState
 
 import Play.Collisions
+
+step :: Float -> PlayState -> PlayState
+step dt pl = if paused pl
+             then pl
+             else stepPlay dt pl
 
 stepPlay :: Float -> PlayState -> PlayState
 stepPlay dt pl@(PlayState { level = l, balls = bs, drawnWalls = ws, drawing = dwg }) =

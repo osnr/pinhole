@@ -5,6 +5,10 @@ module Play.PlayState
 , drawnWalls
 , drawing
 , future
+, paused
+
+, playLevel
+, initBall
 
 , Ball (Ball)
 , pos
@@ -27,6 +31,7 @@ data PlayState = PlayState {
 
     , drawing :: DrawState
     , future :: Bool
+    , paused :: Bool
     } deriving (Show)
 
 data Ball = Ball {
@@ -39,3 +44,20 @@ data Ball = Ball {
 
 data DrawState = Drawing Wall | NotDrawing
                  deriving (Show)
+
+playLevel :: Level -> PlayState
+playLevel l = PlayState {
+                level = l
+
+              , balls = [initBall l]
+              , drawnWalls = []
+              , drawing = NotDrawing
+              , future = False
+              , paused = False }
+
+initBall :: Level -> Ball
+initBall l = Ball { pos = spawn l
+                  , vel = (0, 0)
+                  , theta = 0
+                  , omega = 0
+                  , radius = 20 }
