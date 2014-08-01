@@ -28,6 +28,8 @@ handlePlayEvent event pl@(PlayState { drawing = dwg
           case dwg of
             NotDrawing -> pl
             Drawing (Wall start _) -> pl { drawing = Drawing $ Wall start mPos }
+      EventKey (Char 'u') Up _ _ -> -- undraw the latest line
+          pl { drawnWalls = tail ws }
       EventKey (Char 'f') Up _ _ -> -- see/unsee the future
           pl { future = not ft }
       EventKey (Char 'p') Up _ _ -> -- pause

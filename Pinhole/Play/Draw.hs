@@ -16,8 +16,9 @@ import Play.Step
 doc :: Picture
 doc = color white $ pictures [ text "draw walls by dragging"
                              , translate 0 (-160) $ text "press F to see the future"
-                             , translate 408 (-160 * 2) $ text "P to pause"
-                             , translate 408 (-160 * 3) $ text "R to restart" ]
+                             , translate 408 (-160 * 2) $ text "U to delete newest line"
+                             , translate 408 (-160 * 3) $ text "P to pause"
+                             , translate 408 (-160 * 4) $ text "R to restart" ]
 
 draw :: PlayState -> Picture
 draw pl = case docState pl of
