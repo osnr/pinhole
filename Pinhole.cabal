@@ -12,7 +12,11 @@ Executable Pinhole
   Main-is:             Main.hs
   hs-source-dirs:      Pinhole
   Build-Depends:       base >= 3 && < 5,
+                       directory == 1.2.*,
                        gloss == 1.8.*,
+                       bytestring == 0.10.*,
+                       aeson == 0.8.*,
+                       aeson-pretty == 0.7.*,
                        cabal-macosx
   if os(windows)
     ghc-options:       -Wall -threaded -O2 -optl-mwindows
