@@ -13,6 +13,7 @@ Executable Pinhole
   hs-source-dirs:      Pinhole
   Build-Depends:       base >= 3 && < 5,
                        directory == 1.2.*,
+                       filepath == 1.3.*,
                        gloss == 1.8.*,
                        bytestring == 0.10.*,
                        aeson == 0.8.*,

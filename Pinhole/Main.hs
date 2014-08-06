@@ -1,5 +1,7 @@
 import System.Environment
 import System.Directory
+import System.FilePath
+
 import qualified Data.ByteString.Lazy as B
 import Control.Exception
 import Data.Aeson
@@ -61,7 +63,12 @@ save pl i = do let lvl = level pl
 
                    suffix = show i
                    suffix' = if length suffix < 2 then '0':suffix else suffix
-                   path = "level_" ++ suffix' ++ ".json"
+                   fileName = addExtension ("level_" ++ suffix') "json"
+
+               docsDir <- getUserDocumentsDirectory
+               let dir = docsDir </> "Pinhole"
+               createDirectoryIfMissing False dir
+               let path = dir </> fileName
 
                alreadyExists <- doesFileExist path
                if alreadyExists
