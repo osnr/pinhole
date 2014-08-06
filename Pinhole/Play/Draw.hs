@@ -18,7 +18,8 @@ doc = color white $ pictures [ text "draw walls by dragging"
                              , translate 0 (-160) $ text "press F to see the future"
                              , translate 408 (-160 * 2) $ text "U to delete newest line"
                              , translate 408 (-160 * 3) $ text "P to pause"
-                             , translate 408 (-160 * 4) $ text "R to restart" ]
+                             , translate 408 (-160 * 4) $ text "S to save as level"
+                             , translate 408 (-160 * 5) $ text "R to restart" ]
 
 draw :: PlayState -> Picture
 draw pl = case docState pl of
@@ -26,7 +27,7 @@ draw pl = case docState pl of
             DocDone       -> if paused pl
                              then withDoc
                              else drawPlay pl
-    where withDoc = pictures [ translate 100 (-150) $ scale 0.1 0.1 $ doc
+    where withDoc = pictures [ translate 100 (-130) $ scale 0.1 0.1 $ doc
                              , drawPlay pl ]
 
 drawPlay :: PlayState -> Picture
@@ -43,7 +44,7 @@ drawPlayState PlayState { level = l, balls = bs, drawnWalls = ws, drawing = dwg 
 
 drawLevel :: Level -> Picture
 drawLevel Level { walls = ws } =
-    pictures $ map (drawWall (greyN 0.5)) ws -- drawGoal g :
+    pictures $ map (drawWall (greyN 0.5)) ws
 
 drawFutureBalls :: Float -> (Int, PlayState) -> Picture
 drawFutureBalls maxN (n, PlayState { balls = bs }) = 
