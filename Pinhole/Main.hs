@@ -35,10 +35,23 @@ loadLevel path =
             Left _    -> return initialLevel -- we don't print to stderr/stdout because it will crash Windows app
             Right lvl -> return lvl
 
+pinholeDirectory :: IO FilePath
+pinholeDirectory = do
+  docsDir <- getUserDocumentsDirectory
+  let dir = docsDir </> "Pinhole"
+  createDirectoryIfMissing False dir
+  return dir
+
 main :: IO ()
 main = do args <- getArgs
           lvl <- case args of
-                   []       -> return initialLevel
+                   [] -> do
+                     dir <- pinholeDirectory
+                     let path = dir </> "level.pinhole"
+                     levelExists <- doesFileExist path
+                     if levelExists
+                       then loadLevel path
+                       else return initialLevel
                    path : _ -> loadLevel path
 
           playIO (InWindow "Pinhole" (screenWidth, screenHeight) (0, 0))
@@ -63,11 +76,9 @@ save pl i = do let lvl = level pl
 
                    suffix = show i
                    suffix' = if length suffix < 2 then '0':suffix else suffix
-                   fileName = addExtension ("level_" ++ suffix') "json"
+                   fileName = addExtension ("level_" ++ suffix') "pinhole"
 
-               docsDir <- getUserDocumentsDirectory
-               let dir = docsDir </> "Pinhole"
-               createDirectoryIfMissing False dir
+               dir <- pinholeDirectory
                let path = dir </> fileName
 
                alreadyExists <- doesFileExist path
