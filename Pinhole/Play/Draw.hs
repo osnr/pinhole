@@ -53,7 +53,7 @@ drawFutureBalls maxN (n, PlayState { balls = bs }) =
 
 drawFutures :: PlayState -> Picture
 drawFutures = pictures . take 100 . map (drawFutureBalls 50000) .
-              filter ((== 0) . (`mod` 15) . fst) . zip [1..] . iterate (stepPlay 0)
+              filter ((== 0) . (`mod` 15) . fst) . zip [0..] . iterate (stepPlay 0)
 
 drawBall :: Color -> Float -> Ball -> Picture
 drawBall clr th Ball { pos = (x, y), theta = t, radius = r, vel = (vx, vy) } =
