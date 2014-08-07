@@ -22,7 +22,7 @@ screenWidth = 640
 screenHeight :: Num a => a
 screenHeight = 480
 
-loadLevel :: FilePath -> IO Level
+loadLevel :: FilePath -> IO (Maybe Level)
 loadLevel path =
     let loadLevel' = do
           file <- B.readFile path
@@ -32,8 +32,8 @@ loadLevel path =
             Nothing  -> throwIO . userError $ "Invalid level file format"
     in do lvlE <- try loadLevel'
           case (lvlE :: Either SomeException Level) of
-            Left _    -> return initialLevel -- we don't print to stderr/stdout because it will crash Windows app
-            Right lvl -> return lvl
+            Left _    -> return Nothing -- we don't print to stderr/stdout because it will crash Windows app
+            Right lvl -> return $ Just lvl
 
 pinholeDirectory :: IO FilePath
 pinholeDirectory = do
@@ -42,17 +42,18 @@ pinholeDirectory = do
   createDirectoryIfMissing False dir
   return dir
 
+loadDefaultLevel :: IO Level
+loadDefaultLevel = do
+  dir <- pinholeDirectory
+  let path = dir </> addExtension "level" "pinhole"
+  lvlM <- loadLevel path
+  maybe (return initialLevel) return lvlM
+
 main :: IO ()
 main = do args <- getArgs
-          lvl <- case args of
-                   [] -> do
-                     dir <- pinholeDirectory
-                     let path = dir </> "level.pinhole"
-                     levelExists <- doesFileExist path
-                     if levelExists
-                       then loadLevel path
-                       else return initialLevel
-                   path : _ -> loadLevel path
+          lvl <- case args of -- I should probably be using monad transformers or something
+                   []       -> loadDefaultLevel
+                   path : _ -> loadLevel path >>= maybe loadDefaultLevel return
 
           playIO (InWindow "Pinhole" (screenWidth, screenHeight) (0, 0))
                  black
